@@ -325,17 +325,17 @@ They could easily be parallelized which would then allow for an online analysis.
 
 \begin{figure}
 \centering
-  \begin{subfigure}{0.31\textwidth}
+  \begin{subfigure}{0.48\textwidth}
   \centering
   \includegraphics[width=\textwidth]{progress_4296426-out-boxplot}
   \caption{Job-S (segments=25)}\label{fig:perf-job-S}
   \end{subfigure}
-  \begin{subfigure}{0.31\textwidth}
+  \begin{subfigure}{0.48\textwidth}
   \centering
   \includegraphics[width=\textwidth]{progress_5024292-out-boxplot}
   \caption{Job-M (segments=48)}\label{fig:perf-job-M}
   \end{subfigure}
-  \begin{subfigure}{0.31\textwidth}
+  \begin{subfigure}{0.48\textwidth}
   \centering
   \includegraphics[width=\textwidth]{progress_7488914-out-boxplot}
   \caption{Job-L (segments=400)}\label{fig:perf-job-L}
@@ -397,25 +397,25 @@ Practically, the support team would start with Rank\,1 (most similar job, e.g., 
 \begin{figure}
 \centering
 
-\begin{subfigure}{0.7\textwidth}
+\begin{subfigure}{0.67\textwidth}
 \centering
 \includegraphics[width=\textwidth,trim={0 0 0 2.0cm},clip]{job_similarities_4296426-out/hist-sim}
 \caption{Job-S}\label{fig:hist-job-S}
 \end{subfigure}
 
-\begin{subfigure}{0.7\textwidth}
+\begin{subfigure}{0.67\textwidth}
 \centering
 \includegraphics[width=\textwidth,trim={0 0 0 2.0cm},clip]{job_similarities_5024292-out/hist-sim}
 \caption{Job-M}\label{fig:hist-job-M}
 \end{subfigure}
 
-\begin{subfigure}{0.7\textwidth}
+\begin{subfigure}{0.67\textwidth}
 \centering
 \includegraphics[width=\textwidth,trim={0 0 0 2.0cm},clip]{job_similarities_7488914-out/hist-sim}
 \caption{Job-L}\label{fig:hist-job-L}
 \end{subfigure}
 \centering
-\caption{Histogram for the number of jobs (bin width: 2.5\%, numbers are the actual job counts). B-aggz is nearly identical to B-all.}%
+\caption{Histogram for the number of jobs (bin width: 2.5\%, numbers are the actual job counts). B-aggz is nearly identical to B-all and therefore omitted.}%
 \label{fig:hist}
 \end{figure}
 
@@ -427,7 +427,6 @@ Typically, the support staff would identify the re-execution of jobs by inspecti
 %As they can contain confidential data, it is difficult to anonymize them without perturbing the meaning.
 %Therefore, they are not published in our data repository.
 %}
-% TODO ANONY
 
 To understand if the analysis is inclusive and identifies different applications, we use two approaches with our Top\,100 jobs:
 We explore the distribution of users (and groups), runtime, and node count across jobs.
@@ -459,23 +458,23 @@ For Job-M and Job-L, Q-phases and KS are able to identify much shorter or longer
 For Job-L, the job itself isn't included in the chosen Top\,100 (see \Cref{fig:hist-job-L}, 393 jobs have a similarity of 100\%) which is the reason why the job runtime isn't shown in the figure itself.
 
 \begin{figure}[bt]
-\begin{subfigure}{0.31\textwidth}
+\begin{subfigure}{0.48\textwidth}
 \centering
 \includegraphics[width=\textwidth]{job_similarities_4296426-out/user-ids}
 \caption{Job-S}\label{fig:users-job-S}
 \end{subfigure}
-\begin{subfigure}{0.31\textwidth}
+\begin{subfigure}{0.48\textwidth}
 \centering
 \includegraphics[width=\textwidth]{job_similarities_5024292-out/user-ids}
 \caption{Job-M}\label{fig:users-job-M}
 \end{subfigure}
-\begin{subfigure}{0.31\textwidth}
+\begin{subfigure}{0.48\textwidth}
 \centering
 \includegraphics[width=\textwidth]{job_similarities_7488914-out/user-ids}
 \caption{Job-L}\label{fig:users-job-L}
 \end{subfigure}
 
-\caption{User information for all 100 top-ranked jobs}
+\caption{User information for all 100 top-ranked jobs. Each color represents a specific user for the given data.}
 \label{fig:userids}
 \end{figure}
 
@@ -501,17 +500,17 @@ For Job-L, the job itself isn't included in the chosen Top\,100 (see \Cref{fig:h
 \end{figure}
 
 \begin{figure}
-\begin{subfigure}{0.31\textwidth}
+\begin{subfigure}{0.7\textwidth}
 \centering
 \includegraphics[width=\textwidth]{job_similarities_4296426-out/jobs-elapsed}
 \caption{Job-S ($job=15,551s$)}\label{fig:runtime-job-S}
 \end{subfigure}
-\begin{subfigure}{0.31\textwidth}
+\begin{subfigure}{0.7\textwidth}
 \centering
 \includegraphics[width=\textwidth]{job_similarities_5024292-out/jobs-elapsed}
 \caption{Job-M ($job=28,828s$)}\label{fig:runtime-job-M}
 \end{subfigure}
-\begin{subfigure}{0.31\textwidth}
+\begin{subfigure}{0.7\textwidth}
 \centering
 \includegraphics[width=\textwidth]{job_similarities_7488914-out/jobs-elapsed}
 \caption{Job-L ($job=240ks$)}\label{fig:runtime-job-L}
@@ -532,17 +531,17 @@ From this analysis, we conclude that one representative from B is sufficient as 
 
 
 \begin{figure}[t]
-\begin{subfigure}{0.31\textwidth}
+\begin{subfigure}{0.48\textwidth}
 \centering
 \includegraphics[width=\textwidth]{job_similarities_4296426-out/intersection-heatmap}
 \caption{Job-S}\label{fig:heatmap-job-S}
 \end{subfigure}
-\begin{subfigure}{0.31\textwidth}
+\begin{subfigure}{0.48\textwidth}
 \centering
 \includegraphics[width=\textwidth]{job_similarities_5024292-out/intersection-heatmap}
 \caption{Job-M}\label{fig:heatmap-job-M} %,trim={2.5cm 0 0 0},clip
 \end{subfigure}
-\begin{subfigure}{0.31\textwidth}
+\begin{subfigure}{0.52\textwidth}
 \centering
 \includegraphics[width=\textwidth]{job_similarities_7488914-out/intersection-heatmap}
 \caption{Job-L}\label{fig:heatmap-job-L}
@@ -600,13 +599,13 @@ For Job-S, we found that all algorithms work well and, therefore, omit further t
 
 \begin{figure}[bt]
 \centering
-\begin{subfigure}{0.3\textwidth}
+\begin{subfigure}{0.47\textwidth}
 \centering
 \includegraphics[width=\textwidth]{job_similarities_4296426-out/bin_aggzeros-0.6923--76timeseries4235560}
 \caption{Non-cmor job: Rank\,76, SIM=69\%}
 \end{subfigure}
 \qquad
-\begin{subfigure}{0.3\textwidth}
+\begin{subfigure}{0.47\textwidth}
 \centering
 \includegraphics[width=\textwidth]{job_similarities_4296426-out/bin_aggzeros-0.8077--4timeseries4483904}
 \caption{Non-control job: Rank\,4, SIM=81\%}
@@ -618,17 +617,17 @@ For Job-S, we found that all algorithms work well and, therefore, omit further t
 
 
 \begin{figure}[bt]
-\begin{subfigure}{0.3\textwidth}
+\begin{subfigure}{0.47\textwidth}
 \centering
 \includegraphics[width=\textwidth]{job_similarities_4296426-out/hex_lev-0.9615--1timeseries4296288}
 \caption{Rank 2, SIM=96\%}
 \end{subfigure}
-\begin{subfigure}{0.3\textwidth}
+\begin{subfigure}{0.47\textwidth}
 \centering
 \includegraphics[width=\textwidth]{job_similarities_4296426-out/hex_lev-0.9012--15timeseries4296277}
 \caption{Rank 15, SIM=90\%}
 \end{subfigure}
-\begin{subfigure}{0.3\textwidth}
+\begin{subfigure}{0.47\textwidth}
 \centering
 \includegraphics[width=\textwidth]{job_similarities_4296426-out/hex_lev-0.7901--99timeseries4297842}
 \caption{Rank\,100, SIM=79\%}
@@ -720,22 +719,22 @@ Remember, for the KS algorithm, we concatenate the metrics of all nodes together
 
 
 \begin{figure}[bt]
-\begin{subfigure}{0.3\textwidth}
-\centering
-\includegraphics[width=\textwidth]{job_similarities_5024292-out/bin_aggzeros-0.7755--1timeseries8010306}
-\caption{Rank\,2, SIM=78\%}
-\end{subfigure}
-\begin{subfigure}{0.3\textwidth}
+\begin{subfigure}{0.47\textwidth}
 \centering
 \includegraphics[width=\textwidth]{job_similarities_5024292-out/bin_aggzeros-0.7347--14timeseries4498983}
 \caption{Rank\,15, SIM=73\%}
 \end{subfigure}
-\begin{subfigure}{0.3\textwidth}
+\begin{subfigure}{0.47\textwidth}
 \centering
 \includegraphics[width=\textwidth]{job_similarities_5024292-out/bin_aggzeros-0.5102--99timeseries5120077}
 \caption{Rank\,100, SIM=51\% }
 \end{subfigure}
 
+\begin{subfigure}{0.47\textwidth}
+\centering
+\includegraphics[width=\textwidth]{job_similarities_5024292-out/bin_aggzeros-0.7755--1timeseries8010306}
+\caption{Rank\,2, SIM=78\%}
+\end{subfigure}
 \caption{Job-M with Bin-Aggzero, selection of similar jobs}%
 \label{fig:job-M-bin-aggzero}
 \end{figure}
@@ -743,24 +742,22 @@ Remember, for the KS algorithm, we concatenate the metrics of all nodes together
 
 
 \begin{figure}[bt]
-\begin{subfigure}{0.3\textwidth}
-\centering
-\vspace*{-2cm}
-\includegraphics[width=\textwidth]{job_similarities_5024292-out/hex_lev-0.9546--1timeseries7826634}
-\caption{Rank\,2, SIM=95\%}
-\end{subfigure}
-\begin{subfigure}{0.3\textwidth}
+\begin{subfigure}{0.47\textwidth}
 \centering
 \includegraphics[width=\textwidth]{job_similarities_5024292-out/hex_lev-0.9365--2timeseries5240733}
 \caption{Rank 3, SIM=94\%}
 \end{subfigure}
-\begin{subfigure}{0.3\textwidth}
+\begin{subfigure}{0.47\textwidth}
 \includegraphics[width=\textwidth]{job_similarities_5024292-out/hex_lev-0.7392--15timeseries7651420}
 \caption{Rank\,15, SIM=74\%}
 \end{subfigure}
 
-\vspace*{-1.7cm}
-\begin{subfigure}{0.3\textwidth}
+\begin{subfigure}{0.47\textwidth}
+\centering
+\includegraphics[width=\textwidth]{job_similarities_5024292-out/hex_lev-0.9546--1timeseries7826634}
+\caption{Rank\,2, SIM=95\%}
+\end{subfigure}
+\begin{subfigure}{0.47\textwidth}
 \centering
 \includegraphics[width=\textwidth]{job_similarities_5024292-out/hex_lev-0.7007--99timeseries8201967}
 \caption{Rank\,100, SIM=70\%}
@@ -773,28 +770,24 @@ Remember, for the KS algorithm, we concatenate the metrics of all nodes together
 
 
 \begin{figure}[bt]
-\begin{subfigure}{0.3\textwidth}
+\begin{subfigure}{0.47\textwidth}
 \centering
-\vspace*{-1.6cm}
 \includegraphics[width=\textwidth]{job_similarities_5024292-out/hex_native-0.9878--1timeseries5240733}
 \caption{Rank 2, SIM=99\%}
 \end{subfigure}
-\begin{subfigure}{0.3\textwidth}
-\includegraphics[width=\textwidth]{job_similarities_5024292-out/hex_native-0.9084--14timeseries8037817}
-\caption{Rank 15, SIM=91\%}
-\end{subfigure}
-\begin{subfigure}{0.3\textwidth}
-\centering
-\includegraphics[width=\textwidth]{job_similarities_5024292-out/hex_native-0.8838--99timeseries7571967}
-\caption{Rank 100, SIM=88\%}
-\end{subfigure}
-
-\begin{subfigure}{0.3\textwidth}
-
-\vspace*{-1.5cm}
+\begin{subfigure}{0.47\textwidth}
 \centering
 \includegraphics[width=\textwidth]{job_similarities_5024292-out/hex_native-0.9651--2timeseries7826634}
 \caption{Rank 3, SIM=97\%}
+\end{subfigure}
+\begin{subfigure}{0.47\textwidth}
+\includegraphics[width=\textwidth]{job_similarities_5024292-out/hex_native-0.9084--14timeseries8037817}
+\caption{Rank 15, SIM=91\%}
+\end{subfigure}
+\begin{subfigure}{0.47\textwidth}
+\centering
+\includegraphics[width=\textwidth]{job_similarities_5024292-out/hex_native-0.8838--99timeseries7571967}
+\caption{Rank 100, SIM=88\%}
 \end{subfigure}
 
 \caption{Job-M with Q-native, selection of similar jobs}%
@@ -840,21 +833,21 @@ As expected, the histograms mimics the profile of the reference job, and thus, t
 
 
 \begin{figure}[bt]
-\begin{subfigure}{0.3\textwidth}
+\begin{subfigure}{0.47\textwidth}
 \centering
 \includegraphics[width=\textwidth]{job_similarities_7488914-out/bin_aggzeros-0.1671--1timeseries7869050}
 \caption{Rank 2, SIM=17\%}
 \end{subfigure}
-% \begin{subfigure}{0.3\textwidth}
-% \centering
-% \includegraphics[width=\textwidth]{job_similarities_7488914-out/bin_aggzeros-0.1671--2timeseries7990497}
-% \caption{Rank 3, SIM=17\%}
-% \end{subfigure}
-\begin{subfigure}{0.3\textwidth}
+\begin{subfigure}{0.47\textwidth}
+\centering
+\includegraphics[width=\textwidth]{job_similarities_7488914-out/bin_aggzeros-0.1671--2timeseries7990497}
+\caption{Rank 3, SIM=17\%}
+\end{subfigure}
+\begin{subfigure}{0.47\textwidth}
 \includegraphics[width=\textwidth]{job_similarities_7488914-out/bin_aggzeros-0.1521--14timeseries8363584}
 \caption{Rank 15, SIM=15\%}
 \end{subfigure}
-\begin{subfigure}{0.3\textwidth}
+\begin{subfigure}{0.47\textwidth}
 \centering
 \includegraphics[width=\textwidth]{job_similarities_7488914-out/bin_aggzeros-0.1097--97timeseries4262983}
 \caption{Rank 100, SIM=11\%}
@@ -892,17 +885,17 @@ As expected, the histograms mimics the profile of the reference job, and thus, t
 
 
 \begin{figure}[bt]
-\begin{subfigure}{0.3\textwidth}
+\begin{subfigure}{0.47\textwidth}
 \centering
 \includegraphics[width=\textwidth]{job_similarities_7488914-out/hex_native-0.9390--1timeseries7266845}
 \caption{Rank 2, SIM=94\%}
 \end{subfigure}
-\begin{subfigure}{0.3\textwidth}
+\begin{subfigure}{0.47\textwidth}
 \centering
 \includegraphics[width=\textwidth]{job_similarities_7488914-out/hex_native-0.9333--2timeseries7214657}
 \caption{Rank 3, SIM=93\%}
 \end{subfigure}
-\begin{subfigure}{0.3\textwidth}
+\begin{subfigure}{0.47\textwidth}
 \includegraphics[width=\textwidth]{job_similarities_7488914-out/hex_native-0.8708--14timeseries4936553}
 \caption{Rank 15, SIM=87\%}
 \end{subfigure}
@@ -917,12 +910,12 @@ As expected, the histograms mimics the profile of the reference job, and thus, t
 \end{figure}
 
 \begin{figure}[bt]
-\begin{subfigure}{0.3\textwidth}
+\begin{subfigure}{0.47\textwidth}
 \centering
 \includegraphics[width=\textwidth]{job_similarities_7488914-out/hex_phases-1.0000--14timeseries4577917}
 \caption{Rank 2, SIM=100\%}
 \end{subfigure}
-\begin{subfigure}{0.3\textwidth}
+\begin{subfigure}{0.47\textwidth}
 \centering
 \includegraphics[width=\textwidth]{job_similarities_7488914-out/hex_phases-1.0000--1timeseries4405671}
 \caption{Rank 3, SIM=100\%}
@@ -931,7 +924,7 @@ As expected, the histograms mimics the profile of the reference job, and thus, t
 % \includegraphics[width=\textwidth]{job_similarities_7488914-out/hex_phases-1.0000--2timeseries4621422}
 % \caption{Rank 15, SIM=100\%}
 % \end{subfigure}
-\begin{subfigure}{0.3\textwidth}
+\begin{subfigure}{0.47\textwidth}
 \centering
 \includegraphics[width=\textwidth]{job_similarities_7488914-out/hex_phases-1.0000--99timeseries4232293}
 \caption{Rank 100, SIM=100\%}
