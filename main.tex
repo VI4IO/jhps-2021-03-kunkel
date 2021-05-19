@@ -153,9 +153,11 @@ Therefore, we first need to define how a job's data is represented, then describ
 On the Mistral supercomputer at DKRZ, the monitoring system \cite{betke20} gathers in ten seconds intervals on all nodes nine I/O metrics for the two Lustre file systems together with general job metadata from the SLURM workload manager.
 The results are 4D data (time, nodes, metrics, file system) per job.
 The distance measures should handle jobs of different lengths and node count.
-In \cite{Eugen20HPS}, the authors discussed a variety of options from 1D job-profiles to data reductions to compare time series data and the general workflow and pre-processing in detail. We are using their data.
-In a nutshell, for each job executed on Mistral, they partitioned it into 10 minutes segments and compute the arithmetic mean of each metric, categorize the value into NonIO (0), HighIO (1), and CriticalIO (4) for values below 99-percentile, up to 99.9-percentile, and above, respectively.
-This strategy ensures that the same approach can be applied to other HPC systems.
+In the open access article \cite{Eugen20HPS}\footnote{\url{https://zenodo.org/record/4478960/files/jhps-incubator-06-temporal-29-jan.pdf}}, we discussed a variety of options from 1D job-profiles to data reductions to compare time series data and the general workflow and pre-processing in detail. 
+We will be using this representation.
+In a nutshell, for each job executed on Mistral, they partitioned it into 10 minutes segments\footnote{We found in preliminary experiments that 10 minutes provide sufficient resolution while it reduces noise, i.e., the variation of the statistics when re-running the same job.} and compute the arithmetic mean of each metric, categorize the value into NonIO (0), HighIO (1), and CriticalIO (4) for values below 99-percentile, up to 99.9-percentile, and above, respectively. 
+The values are chosen to be 0, 1, and 4 because we arithmetically derive metrics: naturally the value of 0 will indicate that no I/O issue appears; we weight critical I/O to be 4x as important as high I/O.
+This strategy ensures that the same approach can be applied to other HPC systems regardless of the actual distribution of these statistics on that data center.
 After the mean value across nodes is computed for a segment, the resulting numeric value is encoded either using binary (I/O activity on the segment: yes/no) or hexadecimal representation (quantizing the numerical performance value into 0-15) which is then ready for similarity analysis.
 By pre-filtering jobs with no I/O activity -- their sum across all dimensions and time series is equal to zero, the dataset is reduced from 1 million jobs to about 580k jobs.
 
@@ -166,11 +168,10 @@ B-all determines similarity between binary codings by means of Levenshtein dista
 B-aggz is similar to B-all, but computes similarity on binary codings where subsequent segments of zero activities are replaced by just one zero.
 Q-lev determines similarity between quantized codings by using Levenshtein distance.
 Q-native uses a performance-aware similarity function, i.e., the distance between two jobs for a metric is $\frac{|m_{job1} - m_{job2}|}{16}$.
-For jobs with different lengths, a sliding-windows approach is applied which finds the location for the shorter job in the long job with the highest similarity.
+There are various options for how a longer job is embedded in a shorter job, for example, a larger input file may stretch the length of the I/O and compute phases; another option can be that more (model) time is simulated. In this article, we consider these different behavioral patterns and attempt to identify situations where the I/O pattern of a long job is contained in a shorter job. Therefore, for jobs with different lengths, a sliding-windows approach is applied which finds the location for the shorter job in the long job with the highest similarity.
 Q-phases extract phase information and performs a phase-aware and performance-aware similarity computation.
 The Q-phases algorithm extracts I/O phases from our 10 minute segments and computes the similarity between the most similar I/O phases of both jobs.
 In this paper, we add a similarity definition based on Kolmogorov-Smirnov-Test that compares the probability distribution of the observed values which we describe in the following.
-%In brief, KS concatenates individual node data  and computes similarity by means of Kolmogorov-Smirnov-Test.
 
 \paragraph{Kolmogorov-Smirnov (KS) algorithm.}
 % Summary
@@ -222,13 +223,13 @@ For this study, we chose several reference jobs with different compute and I/O c
   Then only a single master node writes constantly a small volume of data; in fact, the generated data is too small to be categorized as I/O relevant.
 \end{itemize}
 
-The segmented timelines of the jobs are visualized in \Cref{fig:refJobs} -- remember that the mean value is computed across all nodes.
+The segmented timelines of the jobs are visualized in \Cref{fig:refJobs} -- remember that the mean value is computed across all nodes on which the job ran.
 This coding is also used for the Q algorithms, thus this representation is what the algorithms will analyze; B algorithms merge all timelines together as described in~\cite{Eugen20HPS}.
 The figures show the values of active metrics ($\neq 0$); if few are active, then they are shown in one timeline, otherwise, they are rendered individually to provide a better overview.
-For example, we can see in \Cref{fig:job-S}, that several metrics increase in Segment\,6.
-%In \Cref{fig:refJobsHist}, the histograms of the job metrics are shown in Q coding (16 steps).
-\Cref{fig:refJobsHist} summaries hexadecimal codings of Job-S and Job-M to histograms.
-They contain activities of each node at every timestep -- without being averaged across the nodes.
+For example, we can see in \Cref{fig:job-S}, that several metrics increase in Segment\,6. 
+We can also see an interesting result of our categorized coding, the write bytes are bigger than 0 while write calls are 0\footnote{The reason is that a few write calls transfer many bytes; less than our 90\%-quantile, therefore, write calls will be set to 0.}.
+\Cref{fig:refJobsHist} summarizes hexadecimal codings of Job-S and Job-M to histograms:
+A specific histogram contains the metric of each node at every timestep -- without being averaged across the nodes.
 Essentially, this data is used to compare jobs using Kolmogorov-Smirnov-Test.
 The metrics at Job-L are not shown as they have only a handful of instances where the value is not 0, except for write\_bytes: the first process is writing out at a low rate.
 In \Cref{fig:job-L}, the mean value is mostly rounded down to 0 except for the first segment as primarily Rank\,0 is doing I/O.
@@ -439,24 +440,25 @@ To confirm the hypotheses presented, we analyzed the job metadata comparing job 
 To understand how the Top\,100 are distributed across users, the data is grouped by userid and counted.
 \Cref{fig:userids} shows the stacked user information, where the lowest stack is the user with the most jobs and the topmost user in the stack has the smallest number of jobs.
 For Job-S, we can see that about 70-80\% of jobs stem from one user, for the Q-lev and Q-native algorithms, the other jobs stem from a second user while B algorithms include jobs from additional users (5 in total).
-For Job-M, jobs from more users are included (13); about 25\% of jobs stem from the same user; here, Q-lev, Q-native, and KS is including more users (29, 33, and 37, respectively) than the other three algorithms.
-For Job-L, the two Q algorithms include with (12 and 13) a bit more diverse user community than the B algorithms (9) but Q-phases cover 35 users.
+For Job-M, jobs from more users are included (13); about 25\% of jobs stem from the same user; here, Q-lev, Q-native, and KS include more users (29, 33, and 37, respectively) than the other three algorithms.
+For Job-L, the two Q algorithms include (12 and 13) a bit more diverse user community than the B algorithms (9) but Q-phases cover 35 users.
 We didn't include the group analysis in the figure as user count and group id is proportional, at most the number of users is 2x the number of groups.
 Thus, a user is likely from the same group and the number of groups is similar to the number of unique users.
 
 \paragraph{Node distribution.}
-All algorithms reduce over the node dimensions, therefore, we naturally expect a big inclusion across node range -- as long as the average I/O behavior of the jobs is similar.
 \Cref{fig:nodes-job} shows a boxplot for the node counts in the Top\,100 -- the red line marks the reference job.
+All algorithms reduce over the node dimensions, therefore, we naturally expect a big inclusion across node range as long as the average I/O behavior of the jobs is similar.
 For Job-M and Job-L, we can observe that indeed the range of similar nodes is between 1 and 128.
 For Job-S, all 100 top-ranked jobs use one node.
 As post-processing jobs use typically one node and the number of postprocessing jobs is a high proportion, it appears natural that all Top\,100 are from this class of jobs, which is confirmed by investigating the job metadata.
-The boxplots have different shapes which is an indication, that the different algorithms identify a different set of jobs -- we will analyze this later further.
+The boxplots have different shapes which is an indication that the different algorithms identify a different set of jobs -- we will analyze this later further.
 
 \paragraph{Runtime distribution.}
 The job runtime of the Top\,100 jobs is shown using boxplots in \Cref{fig:runtime-job}.
 While all algorithms can compute the similarity between jobs of different length, the B algorithms and Q-native penalize jobs of different length preferring jobs of very similar length.
 For Job-M and Job-L, Q-phases and KS are able to identify much shorter or longer jobs.
-For Job-L, the job itself isn't included in the chosen Top\,100 (see \Cref{fig:hist-job-L}, 393 jobs have a similarity of 100\%) which is the reason why the job runtime isn't shown in the figure itself.
+For Job-L, for Q-phases and KS, the job itself isn't included in the chosen Top\,100 (see \Cref{fig:hist-job-L}, 393 jobs have a similarity of 100\%) which is the reason why the job runtime isn't shown in the figure itself.
+Also, as there are only few jobs of similar lengths to Job-L and the B-* algorithms penalize job-length differences, the Top\,100 similar jobs have a significant difference in job length.
 
 \begin{figure}[bt]
 \begin{subfigure}{0.48\textwidth}
@@ -686,18 +688,21 @@ For Job-S, we found that all algorithms work well and, therefore, omit further t
 
 Inspecting the Top\,100 for this reference job is highlighting the differences between the algorithms.
 All algorithms identify a diverse range of job names for this reference job in the Top\,100.
-Firstly, the name of the reference job appears 30 times in the whole dataset.
+Firstly, the same name of the reference job appears 30 times in the whole dataset. 
+Additional 932 jobs have a slightly modified name.
 So this job type isn't necessarily executed frequently and, therefore, our Top\,100 is expected to contain other names.
+All algorithms identify only the reference job but none of the other jobs with the identical name but 1 (KS), 2 (B-* and Q-native) to 3 (Q-lev and Q-phases) jobs with slightly modified names.
 Some applications are more prominent in these sets, e.g., for B-aggzero, 32~jobs contain WRF (a model) in the name.
 The number of unique names is 19, 38, 49, and 51 for B-aggzero, Q-phases, Q-native and Q-lev, respectively.
 
-The jobs that are similar according to the B algorithms (see \Cref{fig:job-M-bin-aggzero}) differ from our expectations.
+When inspecting their timelines, the jobs that are similar according to the B algorithms (see \Cref{fig:job-M-bin-aggzero}) subjectively appear to us to be different. 
+The reason lies in the definition of the B-* similarity which aggregate all I/O statistics into one timeline.
 The other algorithms like Q-lev (\Cref{fig:job-M-hex-lev}) and Q-native (\Cref{fig:job-M-hex-native}) seem to work as intended:
 While jobs exhibit short bursts of other active metrics even for low similarity, we can eyeball a relevant similarity.
 The KS algorithm working on the histograms ranks the jobs correctly on the similarity of their histograms.
 However, as it does not deal with the length of the jobs, it may identify jobs of very different length.
-In \Cref{fig:job-M-ks}, we see the 3rd ranked job, which profile is indeed quite similar but the time series differs but it is just running for 10min (1 segment) on 10\,nodes.
-Remember, for the KS algorithm, we concatenate the metrics of all nodes together instead of averaging it in order to explore if node-specific information helps the  similarity.
+In \Cref{fig:job-M-ks}, we see the 3rd ranked job whose profile is indeed quite similar but the time series differs but it is just running for 10min (1 segment) on 10\,nodes.
+Remember, for the KS algorithm, we concatenate the metrics of all nodes together instead of averaging it in order to explore if node-specific information helps the similarity.
 
 \begin{figure}[bt]
 \begin{subfigure}{0.5\textwidth}
