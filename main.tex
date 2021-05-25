@@ -161,6 +161,38 @@ This strategy ensures that the same approach can be applied to other HPC systems
 After the mean value across nodes is computed for a segment, the resulting numeric value is encoded either using binary (I/O activity on the segment: yes/no) or hexadecimal representation (quantizing the numerical performance value into 0-15) which is then ready for similarity analysis.
 By pre-filtering jobs with no I/O activity -- their sum across all dimensions and time series is equal to zero, the dataset is reduced from 1 million jobs to about 580k jobs.
 
+\paragraph{Binary coding}
+Binary coding is a data reduction technique that represents monitoring data as a sequence of numbers, where each number stands for a specific I/O behavior.
+It is applied on the hypercube, produced by the previous pre-processing steps (segmentation and categorization).
+This hypercube has four dimensions (nodes, metrics, file systems and time) and is filled with categories.
+The data is reduced in two steps.
+First, reduction of two dimensions (nodes and file systems) and aggregation by the sum() function creates a new two dimensional data structure (metrics and time) filled with integer values.
+Second, reduction of a dimension (metrics) and mapping of integer values to a unique number (behaviour mapping) creates one dimensional data structure (time) filled with I/O behavior.
+Behaviour mapping is a function that maps 9 metrics to 9-bit numbers where each bit represents activity of a metric.
+If the value of a metric is LowIO then the bit is set to 0 (compute intense state), else (for values HighIO and CriticalIO) it is set 1 (IO intense state).
+The following example shows a 15 segment long binary coding:
+
+\begin{lstlisting}
+jobA (after coding): [1:5:0:0:0:0:0:0:96:96:96:96:96:96:96], 'length':15
+\end{lstlisting}
+
+\paragraph{Hexadecimal coding}
+Hexadecimal coding is a data reduction technique, that can be applied on the hypercube to obtain further data reduction.
+After the first two pre-processing steps (segmentation and categorization), a four dimensional hypercube (nodes, metrics, file systems and time) stores performance categories.
+It operates in two steps.
+First, it aggregates two dimensions (nodes and file systems) by the mean() function.
+What remains are two dimensions (metrics and time) and the mean values between 0 an 4.
+Second, the mean values are quantized to 16 levels -- 0 = [0,0.25), 1 = [0.25,0.5), $ \ldots $ , F = [3.75, 4].
+The following example shows a five segment long hexadecimal coding:
+
+\begin{lstlisting}
+jobB: 'length': 6, 'coding':
+  'metric_read'	: [0:2:2:2:9],
+  'metric_write'   : [0:0:0:0:0],
+  ...,
+  'metric_md_other': [0:0:0:F:F]
+\end{lstlisting}
+
 \subsection{Algorithms for Computing Similarity}
 We reuse the B and Q algorithms developed in~\cite{Eugen20HPS}: B-all, B-aggz(eros), Q-native, Q-lev, and Q-phases.
 They differ in the way data similarity is defined; either the time series is encoded in binary or hexadecimal quantization, the distance measure is the Euclidean distance or the Levenshtein-distance.
