@@ -570,14 +570,14 @@ However, we believe that they are still well suited for a visual inspection and 
 
 This job represents post-processing (CMORization) which is a typical step.
 It is executed for different simulations and variables across timesteps.
-The job name suggests that is applied to the control variable.
+The job name suggests that it is applied to the control variable.
 In the metadata, we found 22,580 jobs with “cmor” in the name of which 367 jobs mention “control”.
 
-The B and KS algorithms identify one job which name doesn't include “cmor”.
+The B and KS algorithms identify one job whose name doesn't include “cmor”.
 All other algorithms identify only “cmor” jobs and 26-38 of these jobs are applied to “control” (see \Cref{tbl:control-jobs}) -- only the KS algorithm doesn't identify any job with control.
 A selection of job timelines on control variables is given in \Cref{fig:job-S-hex-lev}.
 The single non-cmor job and a high-ranked non-control cmor job is shown in \Cref{fig:job-S-bin-agg}.
-While we cannot visually see much differences between these two jobs compared to the  the control job, the algorithms indicate that jobs processing the control variables are more similar as they are more frequent in the Top\,100 jobs.
+While we cannot visually see much differences between these two jobs compared to the control job, the algorithms indicate that jobs processing the control variables are more similar as they are more frequent in the Top\,100 jobs.
 For Job-S, we found that all algorithms work well and, therefore, omit further timelines.
 
 \begin{table}[bt]
@@ -587,15 +587,6 @@ For Job-S, we found that all algorithms work well and, therefore, omit further t
   38 &   38 &   33 &   26 &   33 &       0
 \end{tabular}
 
-%\begin{tabular}{r|r}
-%  Algorithm & Jobs \\ \hline
-%    B-aggz & 38 \\
-%    B-all & 38 \\
-%    Q-lev & 33 \\
-%    Q-native & 26 \\
-%    Q-phases & 33 \\
-%    KS & 0
-%\end{tabular}
   \caption{Job-S: number of jobs with “control” in their name in the Top-100}%
   \label{tbl:control-jobs}
 \end{table}
@@ -698,7 +689,7 @@ The number of unique names is 19, 38, 49, and 51 for B-aggzero, Q-phases, Q-nati
 When inspecting their timelines, the jobs that are similar according to the B algorithms (see \Cref{fig:job-M-bin-aggzero}) subjectively appear to us to be different. 
 The reason lies in the definition of the B-* similarity which aggregate all I/O statistics into one timeline.
 The other algorithms like Q-lev (\Cref{fig:job-M-hex-lev}) and Q-native (\Cref{fig:job-M-hex-native}) seem to work as intended:
-While jobs exhibit short bursts of other active metrics even for low similarity, we can eyeball a relevant similarity.
+While jobs exhibit short bursts of other active metrics even for low similarity, we can eyeball a relevant similarity particularly for Rank\,2 and Rank\,3 which have the high similarity of 90+\%. For Rank\,15 to Rank\,100, with around 70\% similarity, a partial match of the metrics is still given.
 The KS algorithm working on the histograms ranks the jobs correctly on the similarity of their histograms.
 However, as it does not deal with the length of the jobs, it may identify jobs of very different length.
 In \Cref{fig:job-M-ks}, we see the 3rd ranked job whose profile is indeed quite similar but the time series differs but it is just running for 10min (1 segment) on 10\,nodes.
@@ -1023,23 +1014,34 @@ Yes
 
 \paragraph{Overall summary and proposal for acceptance}
 
+The paper is presenting a methodology for identifying similarities in concurrent job running similar I/O pattern leveraging Kolmogorov-Smirnov algorithm to reduce the dimension to be considered (factor 2 simplification).The goal of optimizing the I/O subsystem could give fantastic benefit to a user that is willing to optimise his code. Considering the trend these days where data oriented workflows are predominant this work is definitively interesting.
+
+The paper is well structured and the authors analyzed a conspicuous dataset giving the article a solid ground.
+
+I do recommend this paper to be accepted.
 
 \paragraph{Scope}   % in regards to the journal, i.e., does the topic fit?
 
-
+It is definitively in the scope of the workshop.
 
 \paragraph{Significance}   % of the research, minor vs. major
 
+Major
 
 \paragraph{Readability}   % English and structure appropriate?
 
+Well written with perfect English and perfect structure.
 
 \paragraph{Presentation}
 
-
+Clear structure and optimal presentation following a very well set logical structure.
 
 \paragraph{References}   % Correctly formatted?
 
+Yes
+
 \paragraph{Correctness}   % Is the research correct
+
+Based on my knowledge I would say yes it is correct.
 
 \end{document}
