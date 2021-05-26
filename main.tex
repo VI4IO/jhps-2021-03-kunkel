@@ -179,7 +179,7 @@ jobA (after coding): [1:5:0:0:0:0:0:0:96:96:96:96:96:96:96], 'length':15
 \paragraph{Hexadecimal coding}
 Hexadecimal coding is a data reduction technique, that can be applied to the hypercube to obtain further data reduction.
 After the first two pre-processing steps (segmentation and categorization), a four dimensional hypercube (nodes, metrics, file systems and time) stores performance categories.
-It operates in two steps.
+Hexadecimal coding operates in two steps.
 First, it aggregates two dimensions (nodes and file systems) by the mean() function.
 What remains are two dimensions (metrics and time) and the mean values between 0 an 4.
 Second, the mean values are quantized to 16 levels -- 0 = [0,0.25), 1 = [0.25,0.5), $ \ldots $ , F = [3.75, 4].
