@@ -28,11 +28,11 @@
 
 \begin{document}
 
-\JHPSissue{0}   % keep 0 until the issue is assigned
+\JHPSissue{2}   % keep 0 until the issue is assigned
 \JHPSkeywords{performance analysis, monitoring, time series, job analysis}   % add 2-5 keywords
 
   % Author macro takes Name, Institution, Optional Link to the person, Optional Email
-\JHPSauthor{Julian Kunkel}{Georg-August-Universität Göttingen}{https://hps.vi4io.org/about/people/julian_kunkel}{}
+\JHPSauthor{Julian Kunkel}{Georg-August-Universität Göttingen\\ Göttingen, Germany}{https://hps.vi4io.org/about/people/julian_kunkel}{}
 \JHPSauthor{Eugen Betke}{ECMWF\\Reading, UK}{}{eugen.betke@ecmwf.int}   % use empty email here
 
 \title{A Workflow for Identifying Jobs with Similar I/O Behavior Utilizing Time Series Analysis}
@@ -80,7 +80,7 @@ The support staff should focus on workloads for which optimization is beneficial
 By ranking jobs based on their utilization, it is easy to find a job that exhibits extensive usage of computing, network, and I/O resources.
 However, would it be beneficial to investigate this workload in detail and potentially optimize it?
 For instance, a pattern that is observed in many jobs bears potential as the blueprint for optimizing one job may be applied to other jobs as well.
-This is particularly true when running one application with similar inputs but also different applications may lead to similar behavior.
+This is particularly true when running one application with similar inputs, but also different applications may lead to similar behavior.
 Knowing details about a problematic or interesting job may be transferred to similar jobs.
 Therefore, it is useful for support staff (or a user) that investigates a resource-hungry job to identify similar jobs that are executed on the supercomputer.
 
@@ -88,8 +88,8 @@ It is non-trivial to identify jobs with similar behavior from the pool of execut
 Re-executing the same job will lead to slightly different behavior, a program may be executed with different inputs or using a different configuration (e.g., number of nodes).
 Job names are defined by users; while a similar name may hint to be a similar workload, finding other applications with the same I/O behavior would not be possible.
 
-In the paper \cite{Eugen20HPS}, the authors developed several distance measures and algorithms for the clustering of jobs based on the time series and their I/O behavior.
-These distance measures can be applied to jobs with different runtime and number of nodes utilized but differ in the way they define similarity.
+In the paper \cite{Eugen20HPS}, we developed several distance measures and algorithms for the clustering of jobs based on the time series and their I/O behavior.
+These distance measures can be applied to jobs with different runtimes and the number of nodes utilized, but differ in the way they define similarity.
 They showed that the metrics can be used to cluster jobs, however, it remained unclear if the method can be used by data center staff to explore similar jobs effectively.
 In this paper, we refine these algorithms slightly, include another algorithm, and apply them to rank jobs based on their temporal similarity to a reference job.
 
@@ -129,7 +129,7 @@ Vampir generally supports the clustering of process timelines of a single job, a
 
 Chameleon \cite{bahmani2018chameleon} extends ScalaTrace for recording MPI traces but reduces the overhead by clustering processes and collecting information from one representative of each cluster.
 For the clustering, a signature is created for each process that includes the call-graph.
-In \cite{halawa2020unsupervised}, 11 performance metrics including CPU and network are utilized for agglomerative clustering of jobs showing the general effectiveness of the approach.
+In \cite{halawa2020unsupervised}, 11 performance metrics including CPU and network are utilized for agglomerative clustering of jobs, showing the general effectiveness of the approach.
 
 In \cite{rodrigo2018towards}, a characterization of the NERSC workload is performed based on job scheduler information (profiles).
 Profiles that include the MPI activities have shown effective to identify the code that is executed \cite{demasi2013identifying}.
@@ -153,10 +153,10 @@ Therefore, we first need to define how a job's data is represented, then describ
 On the Mistral supercomputer at DKRZ, the monitoring system \cite{betke20} gathers in ten seconds intervals on all nodes nine I/O metrics for the two Lustre file systems together with general job metadata from the SLURM workload manager.
 The results are 4D data (time, nodes, metrics, file system) per job.
 The distance measures should handle jobs of different lengths and node count.
-In the open access article \cite{Eugen20HPS}\footnote{\url{https://zenodo.org/record/4478960/files/jhps-incubator-06-temporal-29-jan.pdf}}, we discussed a variety of options from 1D job-profiles to data reductions to compare time series data and the general workflow and pre-processing in detail. 
+In the open-access article \cite{Eugen20HPS}, we discussed a variety of options from 1D job-profiles to data reductions to compare time series data and the general workflow and pre-processing in detail. 
 We will be using this representation.
-In a nutshell, for each job executed on Mistral, they partitioned it into 10 minutes segments\footnote{We found in preliminary experiments that 10 minutes provide sufficient resolution while it reduces noise, i.e., the variation of the statistics when re-running the same job.} and compute the arithmetic mean of each metric, categorize the value into NonIO (0), HighIO (1), and CriticalIO (4) for values below 99-percentile, up to 99.9-percentile, and above, respectively. 
-The values are chosen to be 0, 1, and 4 because we arithmetically derive metrics: naturally the value of 0 will indicate that no I/O issue appears; we weight critical I/O to be 4x as important as high I/O.
+In a nutshell, for each job executed on Mistral, they partitioned it into 10 minutes segments\footnote{We found in preliminary experiments that 10 minutes provide sufficient resolution while reducing compute time and noise, i.e., the variation of the statistics when re-running the same job.} and compute the arithmetic mean of each metric, categorize the value into NonIO (0), HighIO (1), and CriticalIO (4) for values below 99-percentile, up to 99.9-percentile, and above, respectively. 
+The values are chosen to be 0, 1, and 4 because we arithmetically derive metrics: naturally, the value of 0 will indicate that no I/O issue appears; we weight critical I/O to be 4x as important as high I/O.
 This strategy ensures that the same approach can be applied to other HPC systems regardless of the actual distribution of these statistics on that data center.
 After the mean value across nodes is computed for a segment, the resulting numeric value is encoded either using binary (I/O activity on the segment: yes/no) or hexadecimal representation (quantizing the numerical performance value into 0-15) which is then ready for similarity analysis.
 By pre-filtering jobs with no I/O activity -- their sum across all dimensions and time series is equal to zero, the dataset is reduced from 1 million jobs to about 580k jobs.
@@ -169,7 +169,7 @@ The data is reduced in two steps.
 First, reduction of two dimensions (nodes and file systems) and aggregation by the sum() function creates a new two-dimensional data structure (metrics and time) filled with integer values.
 Second, reduction of a dimension (metrics) and mapping of integer values to a unique number (behavior mapping) creates a one dimensional data structure (time) filled with I/O behavior.
 Behavior mapping is a function that maps 9 metrics to 9-bit numbers where each bit represents activity of a metric.
-If the value of a metric is LowIO then the bit is set to 0 (compute intense state), else (for values HighIO and CriticalIO) it is set to 1 (IO intense state).
+If the value of a metric is LowIO, then the bit is set to 0 (compute intense state), else (for values HighIO and CriticalIO) it is set to 1 (IO intense state).
 The following example shows a 15 segment long binary coding:
 
 \begin{lstlisting}
@@ -195,13 +195,13 @@ jobB: 'length': 6, 'coding':
 
 \subsection{Algorithms for Computing Similarity}
 We reuse the B and Q algorithms developed in~\cite{Eugen20HPS}: B-all, B-aggz(eros), Q-native, Q-lev, and Q-phases.
-They differ in the way data similarity is defined; either the time series is encoded in binary or hexadecimal quantization, the distance measure is the Euclidean distance or the Levenshtein-distance.
+They differ in the way data similarity is defined; either the time series is encoded in binary or hexadecimal quantization, the distance measure is the Euclidean distance or the Levenshtein distance.
 B-all determines similarity between binary codings by means of Levenshtein distance.
 B-aggz is similar to B-all, but computes similarity on binary codings where subsequent segments of zero activities are replaced by just one zero.
 Q-lev determines similarity between quantized codings by using Levenshtein distance.
 Q-native uses a performance-aware similarity function, i.e., the distance between two jobs for a metric is $\frac{|m_{job1} - m_{job2}|}{16}$.
 There are various options for how a longer job is embedded in a shorter job, for example, a larger input file may stretch the length of the I/O and compute phases; another option can be that more (model) time is simulated. In this article, we consider these different behavioral patterns and attempt to identify situations where the I/O pattern of a long job is contained in a shorter job. Therefore, for jobs with different lengths, a sliding-windows approach is applied which finds the location for the shorter job in the long job with the highest similarity.
-Q-phases extract phase information and performs a phase-aware and performance-aware similarity computation.
+Q-phases extracts phase information and performs a phase-aware and performance-aware similarity computation.
 The Q-phases algorithm extracts I/O phases from our 10-minute segments and computes the similarity between the most similar I/O phases of both jobs.
 In this paper, we add a similarity definition based on Kolmogorov-Smirnov-Test that compares the probability distribution of the observed values which we describe in the following.
 
@@ -233,7 +233,7 @@ The similarity function calculates the mean inverse of reject probability $p_{\t
 Our strategy for localizing similar jobs works as follows:
 \begin{itemize}
   \item A user\footnote{This can be support staff or a data center user that was executing the job.} provides a reference job ID and selects a similarity algorithm.
-  \item The system iterates over all jobs of the job pool computing the similarity to the reference job using the specified algorithm.
+  \item The system iterates over all jobs of the job pool, computing the similarity to the reference job using the specified algorithm.
   \item It sorts the jobs based on the similarity to the reference job.
   \item It visualizes the cumulative job similarity allowing the user to understand how job similarity is distributed.
   \item The user starts the inspection by looking at the most similar jobs first.
@@ -241,7 +241,7 @@ Our strategy for localizing similar jobs works as follows:
 The user can decide about the criterion when to stop inspecting jobs; based on the similarity, the number of investigated jobs, or the distribution of the job similarity.
 For the latter, it is interesting to investigate clusters of similar jobs, e.g., if there are many jobs between 80-90\% similarity but few between 70-80\%.
 
-For the inspection of the jobs, a user may explore the job metadata, searching for similarities, and explore the time series of a job's I/O metrics.
+For the inspection of the jobs, a user may explore the job metadata, search for similarities, and explore the time series of a job's I/O metrics.
 
 \section{Reference Jobs}%
 \label{sec:refjobs}
@@ -249,7 +249,7 @@ For the inspection of the jobs, a user may explore the job metadata, searching f
 For this study, we chose several reference jobs with different compute and I/O characteristics:
 \begin{itemize}
 	\item Job-S: performs post-processing on a single node. This is a typical process in climate science where data products are reformatted and annotated with metadata to a standard representation (so-called CMORization). The post-processing is I/O intensive.
-  \item Job-M: a typical MPI parallel 8-hour compute job on 128 nodes which write time series data after some spin up.   %CHE.ws12
+  \item Job-M: a typical MPI parallel 8-hour compute job on 128 nodes that write time series data after some spin up.   %CHE.ws12
 	\item Job-L: a 66-hour 20-node job.
   The initialization data is read at the beginning.
   Then only a single master node writes constantly a small volume of data; in fact, the generated data is too small to be categorized as I/O relevant.
@@ -336,7 +336,7 @@ In \Cref{fig:job-L}, the mean value is mostly rounded down to 0 except for the f
 \section{Evaluation}%
 \label{sec:evaluation}
 
-In the following, we assume a reference job is given (we use Job-S, Job-M, and Job-L) and we aim to identify similar jobs.
+In the following, we assume a reference job is given (we use Job-S, Job-M, and Job-L), and we aim to identify similar jobs.
 For each reference job and algorithm, we created CSV files with the computed similarity to all other jobs from our job pool (worth 203 days of production of Mistral).
 During this process, the runtime of the algorithm is recorded.
 Then we inspect the correlation between the similarity and number of found jobs.
@@ -352,10 +352,10 @@ The runtime is normalized for 100k jobs, i.e., for B-all it takes about 41\,s to
 Generally, the B algorithms are fastest, while the Q algorithms often take 4-5x as long.
 Q\_phases is slow for Job-S and Job-M while it is fast for Job-L. 
 The reason is that just one phase is extracted for Job-L.
-The Levenshtein based algorithms take longer for longer jobs -- proportional to the job length as it applies a sliding window.
+The Levenshtein-based algorithms take longer for longer jobs -- proportional to the job length as it applies a sliding window.
 The KS algorithm is faster than the others by 10x, but it operates on the statistics of the time series.
 Note that the current algorithms are sequential and executed on just one core.
-They could easily be parallelized which would then allow for an online analysis.
+They could easily be parallelized, which would then allow for an online analysis.
 
 \begin{figure}
 \centering
@@ -457,10 +457,10 @@ Practically, the support team would start with Rank\,1 (most similar job, e.g., 
 
 When analyzing the overall population of jobs executed on a system, we expect that some workloads are executed several times (with different inputs but with the same configuration) or are executed with slightly different configurations (e.g., node counts, timesteps).
 Thus, potentially our similarity analysis of the job population may just identify the re-execution of the same workload.
-Typically, the support staff would identify the re-execution of jobs by inspecting job names which are user-defined generic strings%\footnote{%
-%As they can contain confidential data, it is difficult to anonymize them without perturbing the meaning.
-%Therefore, they are not published in our data repository.
-%}
+Typically, the support staff would identify the re-execution of jobs by inspecting job names, which are user-defined generic strings\footnote{%
+As they can contain confidential data, it is difficult to anonymize them without perturbing the meaning.
+Therefore, they are not published in our data repository.
+}.
 
 To understand if the analysis is inclusive and identifies different applications, we use two approaches with our Top\,100 jobs:
 We explore the distribution of users (and groups), runtime, and node count across jobs.
@@ -469,25 +469,25 @@ To confirm the hypotheses presented, we analyzed the job metadata comparing job 
 
 
 \paragraph{User distribution.}
-To understand how the Top\,100 are distributed across users, the data is grouped by userid and counted.
+To understand how the Top\,100 are distributed across users, the data is grouped by user ID and counted.
 \Cref{fig:userids} shows the stacked user information, where the lowest stack is the user with the most jobs and the topmost user in the stack has the smallest number of jobs.
 For Job-S, we can see that about 70-80\% of jobs stem from one user, for the Q-lev and Q-native algorithms, the other jobs stem from a second user while B algorithms include jobs from additional users (5 in total).
 For Job-M, jobs from more users are included (13); about 25\% of jobs stem from the same user; here, Q-lev, Q-native, and KS include more users (29, 33, and 37, respectively) than the other three algorithms.
 For Job-L, the two Q algorithms include (12 and 13) a bit more diverse user community than the B algorithms (9) but Q-phases cover 35 users.
-We didn't include the group analysis in the figure as user count and group id is proportional, at most the number of users is 2x the number of groups.
+We didn't include the group analysis in the figure as user count and group ID are proportional, at most the number of users is 2x the number of groups.
 Thus, a user is likely from the same group and the number of groups is similar to the number of unique users.
 
 \paragraph{Node distribution.}
 \Cref{fig:nodes-job} shows a boxplot for the node counts in the Top\,100 -- the red line marks the reference job.
 All algorithms reduce over the node dimensions, therefore, we naturally expect a big inclusion across the node range as long as the average I/O behavior of the jobs is similar.
-For Job-M and Job-L, we can observe that indeed the range of similar nodes is between 1 and 128.
+For Job-M and Job-L, we can observe that indeed the range of nodes for similar jobs is between 1 and 128.
 For Job-S, all 100 top-ranked jobs use one node.
 As post-processing jobs use typically one node and the number of post-processing jobs is a high proportion, it appears natural that all Top\,100 are from this class of jobs, which is confirmed by investigating the job metadata.
 The boxplots have different shapes which is an indication that the different algorithms identify a different set of jobs -- we will analyze this later further.
 
 \paragraph{Runtime distribution.}
 The job runtime of the Top\,100 jobs is shown using boxplots in \Cref{fig:runtime-job}.
-While all algorithms can compute the similarity between jobs of different length, the B algorithms and Q-native penalize jobs of different length preferring jobs of very similar length.
+While all algorithms can compute the similarity between jobs of different lengths, the B algorithms and Q-native penalize jobs of different lengths preferring jobs of very similar length.
 For Job-M and Job-L, Q-phases and KS are able to identify much shorter or longer jobs.
 For Job-L, for Q-phases and KS, the job itself isn't included in the chosen Top\,100 (see \Cref{fig:hist-job-L}, 393 jobs have a similarity of 100\%) which is the reason why the job runtime isn't shown in the figure itself.
 Also, as there are only few jobs of similar lengths to Job-L and the B-* algorithms penalize job-length differences, the Top\,100 similar jobs have a significant difference in job length.
@@ -716,10 +716,10 @@ Additional 932 jobs have a slightly modified name.
 So this job type isn't necessarily executed frequently and, therefore, our Top\,100 is expected to contain other names.
 All algorithms identify only the reference job but none of the other jobs with the identical name but 1 (KS), 2 (B-* and Q-native) to 3 (Q-lev and Q-phases) jobs with slightly modified names.
 Some applications are more prominent in these sets, e.g., for B-aggzero, 32~jobs contain WRF (a model) in the name.
-The number of unique names is 19, 38, 49, and 51 for B-aggzero, Q-phases, Q-native and Q-lev, respectively.
+The number of unique names is 19, 38, 49, and 51 for B-aggzero, Q-phases, Q-native, and Q-lev, respectively.
 
 When inspecting their timelines, the jobs that are similar according to the B algorithms (see \Cref{fig:job-M-bin-aggzero}) subjectively appear to us to be different. 
-The reason lies in the definition of the B-* similarity which aggregate all I/O statistics into one timeline.
+The reason lies in the definition of the B-* similarity, which aggregates all I/O statistics into one timeline.
 The other algorithms like Q-lev (\Cref{fig:job-M-hex-lev}) and Q-native (\Cref{fig:job-M-hex-native}) seem to work as intended:
 While jobs exhibit short bursts of other active metrics even for low similarity, we can eyeball a relevant similarity particularly for Rank\,2 and Rank\,3 which have the high similarity of 90+\%. For Rank\,15 to Rank\,100, with around 70\% similarity, a partial match of the metrics is still given.
 The KS algorithm working on the histograms ranks the jobs correctly on the similarity of their histograms.
@@ -978,8 +978,8 @@ Job-L is tricky to analyze, because it is compute-intense with only a single I/O
 Generally, the KS algorithm finds jobs with similar histograms which are not necessarily what we subjectively are looking for.
 We found that the approach to compute similarity of reference jobs to all jobs and ranking these was successful to find related jobs that we were interested in.
 The Q-lev and Q-native work best according to our subjective qualitative analysis.
-Typically, a related job stems from the same user/group and may have a related job name, but the approach was able to find other jobs as well.
-The pre-processing of the algorithms and distance metrics differ leading to a different definition of similarity.
+Typically, a related job stem from the same user/group and may have a related job name, but the approach was able to find other jobs as well.
+The pre-processing of the algorithms and distance metrics differ leading to alternative definitions of similarity.
 The data center support/user must define how to define similarity to select the algorithm that suits best.
 Another consideration could be to identify jobs that are found by all algorithms, i.e., jobs that meet a certain (rank) threshold for different algorithms.
 That would increase the likelihood that these jobs are very similar and what the user is looking for.
